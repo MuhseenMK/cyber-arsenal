@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkSage | Cyber Arsenal</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #00ff41;
+            --accent-dim: #00cc33;
+            --accent-glow: rgba(0, 255, 65, 0.3);
+            --danger: #ff3333;
+            --warning: #ffaa00;
+            --info: #00aaff;
+            --border: #2a2a2a;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', 'Fira Code', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Matrix Rain Background */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.05;
+        }
+
+        /* Scanline Effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.03) 2px,
+                    rgba(0, 0, 0, 0.03) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+            letter-spacing: 2px;
+            animation: flicker 5s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+                opacity: 1;
+            }
+            20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+                opacity: 0.8;
+            }
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Search */
+        .search-container {
+            position: relative;
+            flex: 0 1 400px;
+            margin: 0 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            pointer-events: none;
+        }
+
+        /* Sidebar Toggle */
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: inherit;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 20px;
+            z-index: 999;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--accent-dim);
+            border-radius: 10px;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-category {
+            color: var(--accent);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            margin-bottom: 3px;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-tertiary);
+            color: var(--accent);
+            transform: translateX(5px);
+            box-shadow: -3px 0 0 var(--accent);
+        }
+
+        .nav-link.active {
+            background: var(--bg-tertiary);
+            color: var(--accent);
+            box-shadow: -3px 0 0 var(--accent);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 30px;
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Terminal Header */
+        .terminal-header {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 5px 5px 0 0;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red {
+            background: #ff5f56;
+        }
+        .terminal-dot.yellow {
+            background: #ffbd2e;
+        }
+        .terminal-dot.green {
+            background: #27c93f;
+        }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Section Cards */
+        .section {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-top: none;
+            padding: 20px;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-emoji {
+            font-size: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        /* Resource Grid */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .resource-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .resource-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+            transition: left 0.3s ease;
+        }
+
+        .resource-card:hover::before {
+            left: 0;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px var(--accent-glow);
+            background: var(--bg-tertiary);
+        }
+
+        .resource-card .card-title {
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .resource-card .card-desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .resource-card .card-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-right: 5px;
+        }
+
+        .resource-card .external-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .resource-card:hover .external-icon {
+            opacity: 1;
+        }
+
+        /* Glitch effect for special cards */
+        .resource-card.featured {
+            border-color: var(--accent-dim);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+        }
+
+        .resource-card.featured:hover {
+            animation: glitch 0.5s ease;
+        }
+
+        @keyframes glitch {
+            0% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-3px, 3px);
+            }
+            40% {
+                transform: translate(3px, -3px);
+            }
+            60% {
+                transform: translate(-3px, -3px);
+            }
+            80% {
+                transform: translate(3px, 3px);
+            }
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .search-container {
+                flex: 0 1 200px;
+            }
+
+            .resource-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 0 10px;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-container {
+                flex: 0 1 150px;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* No results */
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .no-results .emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        /* YouTube embed modal */
+        .youtube-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .youtube-modal.active {
+            display: flex;
+        }
+
+        .youtube-modal-content {
+            position: relative;
+            width: 80%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+        }
+
+        .youtube-modal iframe {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 5px 15px;
+            cursor: pointer;
+            font-family: inherit;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            margin-top: 50px;
+        }
+
+        .footer .sage-name {
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+            font-weight: bold;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-dim);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Rain Canvas -->
+    <canvas id="matrix-bg"></canvas>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="status-dot"></div>
+            <span class="logo">⚡ DarkSage</span>
+            <span style="color: var(--text-secondary); font-size: 0.8rem;">// Cyber Arsenal v1.0</span>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search resources... (e.g., 'nmap', 'web', 'CTF')">
+            <span class="search-icon">⌕</span>
+        </div>
+
+        <button class="sidebar-toggle" id="sidebarToggle">☰ Arsenal</button>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="nav-section">
+            <div class="nav-category">🎯 Learning</div>
+            <a href="#basics" class="nav-link active">🌐 Basics & Courses</a>
+            <a href="#ctf" class="nav-link">🏁 CTF Platforms</a>
+            <a href="#labs" class="nav-link">💻 Labs & Challenges</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-category">🛠️ Tools</div>
+            <a href="#tools-recon" class="nav-link">🔍 Recon / OSINT</a>
+            <a href="#tools-pentest" class="nav-link">🛠️ Pentesting</a>
+            <a href="#tools-crypto" class="nav-link">🔓 Hash / Crypto</a>
+            <a href="#tools-util" class="nav-link">🧪 Utilities</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-category">⚔️ Offensive</div>
+            <a href="#ad" class="nav-link">🏢 Active Directory</a>
+            <a href="#redteam" class="nav-link">🔴 Red Team</a>
+            <a href="#bugbounty" class="nav-link">🐞 Bug Bounty</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-category">🛡️ Defensive</div>
+            <a href="#blueteam" class="nav-link">🟦 Blue Team</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-category">📚 Knowledge</div>
+            <a href="#programming" class="nav-link">🧩 Programming</a>
+            <a href="#lowlevel" class="nav-link">⚙️ Low Level / RE</a>
+            <a href="#osint-adv" class="nav-link">🔎 OSINT Advanced</a>
+            <a href="#books" class="nav-link">📚 Books / Notes</a>
+            <a href="#cheatsheets" class="nav-link">🧠 Cheat Sheets</a>
+            <a href="#youtube" class="nav-link">📺 YouTube</a>
+            <a href="#blogs" class="nav-link">🌍 Blogs / News</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-category">🔮 Special</div>
+            <a href="#ai" class="nav-link">🤖 AI / ML</a>
+            <a href="#malware" class="nav-link">🧠 Malware Dev</a>
+            <a href="#auto" class="nav-link">🚗 Automotive</a>
+            <a href="#firmware" class="nav-link">🔐 Firmware</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-category">📦 Reference</div>
+            <a href="#masterlists" class="nav-link">📦 Master Lists</a>
+            <a href="#roadmap" class="nav-link">🧭 Roadmap</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Sections will be injected by JS -->
+    </main>
+
+    <!-- YouTube Modal -->
+    <div class="youtube-modal" id="youtubeModal">
+        <div class="youtube-modal-content">
+            <button class="close-modal" id="closeModal">✕ CLOSE</button>
+            <div id="youtubePlayer"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>🛡️ <span class="sage-name">DarkSage</span> Cyber Arsenal • Curated with precision • <span id="currentYear"></span></p>
+        <p style="font-size: 0.8rem; margin-top: 5px;">// Knowledge is power. Power is control. Control is everything.</p>
+    </footer>
+
+    <script>
+        // Resource data structure
+        const resources = {
+            basics: {
+                title: '🌐 Core Learning - Basics & Courses',
+                desc: 'Build your foundation. Master the fundamentals before diving deep.',
+                items: [
+                    { title: 'PortSwigger Web Security', url: 'https://portswigger.net/web-security/learning-paths',
+                        desc: 'Industry-standard web security learning paths.', tag: 'Web', featured: true },
+                    { title: 'CTF 101', url: 'https://ctf101.org/', desc: 'Comprehensive CTF guide for beginners.',
+                        tag: 'CTF' },
+                    { title: 'PicoCTF Primer', url: 'https://primer.picoctf.com/', desc: 'Interactive CTF introduction.',
+                        tag: 'CTF' },
+                    { title: 'TryHackMe', url: 'https://tryhackme.com/', desc: 'Hands-on cybersecurity training.',
+                        tag: 'Lab', featured: true },
+                    { title: 'CS50 Harvard', url: 'https://pll.harvard.edu/course/cs50-introduction-computer-science',
+                        desc: 'Legendary computer science course.', tag: 'Course' },
+                    { title: 'Google Cybersecurity Cert', url:
+                            'https://www.coursera.org/professional-certificates/google-cybersecurity',
+                        desc: 'Professional cybersecurity certification.', tag: 'Course' },
+                    { title: 'MOOC.fi', url: 'https://mooc.fi/', desc: 'Free online courses from Finland.',
+                    tag: 'Course' },
+                ]
+            },
+            ctf: {
+                title: '🏁 CTF Platforms',
+                desc: 'Test your skills in capture-the-flag competitions.',
+                items: [
+                    { title: 'CTFlearn', url: 'https://ctflearn.com/', desc: 'Beginner-friendly CTF platform.',
+                        tag: 'Beginner', featured: true },
+                    { title: 'VulnHub', url: 'https://www.vulnhub.com/', desc: 'Downloadable vulnerable machines.',
+                        tag: 'VMs' },
+                    { title: 'Hack This Site', url: 'https://hackthissite.org/', desc: 'Classic hacking challenges.',
+                        tag: 'Classic' },
+                    { title: 'EchoCTF', url: 'https://echoctf.red/', desc: 'Interactive CTF platform.', tag: 'CTF' },
+                    { title: 'Wizer CTF', url: 'https://wizer-ctf.com/', desc: 'Security awareness CTFs.', tag: 'CTF' },
+                    { title: 'Hacktoria', url: 'https://hacktoria.com/', desc: 'OSINT and geolocation challenges.',
+                        tag: 'OSINT' },
+                    { title: 'WeChall', url: 'https://www.wechall.net/', desc: 'Challenge site aggregator.', tag: 'Aggregator' },
+                ]
+            },
+            labs: {
+                title: '💻 Labs & Challenges',
+                desc: 'Real-world environments to practice your skills.',
+                items: [
+                    { title: 'OWASP Juice Shop', url: 'https://owasp.org/www-project-juice-shop/',
+                        desc: 'Modern vulnerable web application.', tag: 'Web', featured: true },
+                    { title: 'pwn.college', url: 'https://pwn.college/', desc: 'Cybersecurity education platform.',
+                        tag: 'Education' },
+                    { title: 'Malware Unicorn', url: 'https://malwareunicorn.org/#/workshops',
+                        desc: 'Reverse engineering workshops.', tag: 'RE' },
+                    { title: 'Crackmes.one', url: 'https://crackmes.one/', desc: 'Reverse engineering challenges.',
+                        tag: 'RE' },
+                    { title: 'Gin & Juice Shop', url: 'https://ginandjuice.shop/',
+                        desc: 'Another vulnerable web application.', tag: 'Web' },
+                ]
+            },
+            'tools-recon': {
+                title: '🔍 Recon / OSINT Tools',
+                desc: 'Discover, enumerate, and gather intelligence.',
+                items: [
+                    { title: 'OSINT Framework', url: 'https://www.osintframework.com/',
+                        desc: 'Comprehensive OSINT resource map.', tag: 'OSINT', featured: true },
+                    { title: 'DataSploit', url: 'https://github.com/DataSploit/datasploit', desc: 'Automated OSINT tool.',
+                        tag: 'Automation' },
+                    { title: 'Awesome OSINT', url: 'https://github.com/Astrosp/Awesome-OSINT-For-Everything',
+                        desc: 'Curated OSINT resource list.', tag: 'List' },
+                    { title: 'Ultimate OSINT Collection', url: 'https://start.me/p/DPYPMz/the-ultimate-osint-collection',
+                        desc: 'Start.me OSINT page.', tag: 'OSINT' },
+                    { title: 'Nixintel OSINT', url: 'https://start.me/p/rx6Qj8/nixintel-s-osint-resource-list',
+                        desc: 'Expert OSINT resource list.', tag: 'OSINT' },
+                ]
+            },
+            'tools-pentest': {
+                title: '🛠️ Pentesting Tools',
+                desc: 'Essential tools for penetration testing.',
+                items: [
+                    { title: 'Nmap', url: 'https://nmap.org/', desc: 'Network discovery and security scanning.',
+                        tag: 'Scanner', featured: true },
+                    { title: 'Burp Suite', url: 'https://portswigger.net/burp', desc: 'Web application security testing.',
+                        tag: 'Web', featured: true },
+                    { title: 'Wireshark', url: 'https://www.wireshark.org/', desc: 'Network protocol analyzer.',
+                        tag: 'Network' },
+                    { title: 'Nessus', url: 'https://www.tenable.com/products/nessus',
+                        desc: 'Vulnerability assessment scanner.', tag: 'Scanner' },
+                    { title: 'Feroxbuster', url: 'https://github.com/epi052/feroxbuster',
+                        desc: 'Fast web content discovery tool.', tag: 'Web' },
+                    { title: 'SecLists', url: 'https://github.com/danielmiessler/SecLists',
+                        desc: 'Security testing wordlists.', tag: 'Wordlist' },
+                    { title: 'NmapKitty', url: 'https://nmapkitty.vercel.app/', desc: 'Nmap GUI helper.', tag: 'GUI' },
+                ]
+            },
+            'tools-crypto': {
+                title: '🔓 Hash / Crypto Tools',
+                desc: 'Crack and analyze cryptographic hashes.',
+                items: [
+                    { title: 'MD5Hashing', url: 'https://md5hashing.net/', desc: 'Online hash cracking service.',
+                        tag: 'Hash' },
+                    { title: 'CrackStation', url: 'https://crackstation.net/', desc: 'Massive hash lookup service.',
+                        tag: 'Hash', featured: true },
+                ]
+            },
+            'tools-util': {
+                title: '🧪 Utilities',
+                desc: 'Cyber Swiss Army knives for data manipulation.',
+                items: [
+                    { title: 'CyberChef', url: 'https://gchq.github.io/CyberChef/',
+                        desc: 'The Cyber Swiss Army Knife.', tag: 'Utility', featured: true },
+                    { title: 'ReqBin', url: 'https://reqbin.com/', desc: 'Online HTTP request testing tool.',
+                        tag: 'Web' },
+                ]
+            },
+            ad: {
+                title: '🏢 Active Directory Pentesting',
+                desc: 'Own the enterprise. Master AD exploitation.',
+                items: [
+                    { title: 'Impacket', url: 'https://www.kali.org/tools/impacket/',
+                        desc: 'AD exploitation toolkit (Kali).', tag: 'AD', featured: true },
+                    { title: 'Evil-WinRM', url: 'https://www.kali.org/tools/evil-winrm/',
+                        desc: 'Windows Remote Management shell.', tag: 'Shell' },
+                    { title: 'PowerCat', url: 'https://github.com/secabstraction/PowerCat', desc: 'Netcat PowerShell version.',
+                        tag: 'PowerShell' },
+                    { title: 'NetExec', url: 'https://www.netexec.wiki/', desc: 'Network execution tool (CrackMapExec successor).',
+                        tag: 'AD', featured: true },
+                    { title: 'BloodyAD', url: 'https://github.com/CravateRouge/bloodyAD', desc: 'Active Directory privilege escalation.',
+                        tag: 'AD' },
+                    { title: 'Certipy', url: 'https://github.com/ly4k/Certipy',
+                        desc: 'AD Certificate Services exploitation.', tag: 'ADCS' },
+                    { title: 'BloodHound Guide', url: 'https://www.thehacker.recipes/ad/recon/bloodhound/',
+                        desc: 'AD attack path mapping guide.', tag: 'Guide', featured: true },
+                ]
+            },
+            redteam: {
+                title: '🔴 Red Team / Offensive',
+                desc: 'Think like an attacker. Operate like one.',
+                items: [
+                    { title: 'ired.team', url: 'https://www.ired.team/offensive-security-experiments/offensive-security-cheetsheets',
+                        desc: 'Offensive security cheat sheets.', tag: 'Cheatsheet', featured: true },
+                    { title: '100 Red Team Projects', url: 'https://github.com/kurogai/100-redteam-projects',
+                        desc: 'Project ideas for red teamers.', tag: 'Projects' },
+                    { title: 'GOAD', url: 'https://github.com/Orange-Cyberdefense/GOAD',
+                        desc: 'Game of Active Directory lab.', tag: 'Lab', featured: true },
+                    { title: 'AI Red Teaming Labs', url: 'https://github.com/microsoft/AI-Red-Teaming-Playground-Labs',
+                        desc: 'Microsoft AI red teaming exercises.', tag: 'AI' },
+                    { title: 'Exploit-DB', url: 'https://www.exploit-db.com/', desc: 'Exploit database and PoCs.',
+                        tag: 'Exploits', featured: true },
+                ]
+            },
+            bugbounty: {
+                title: '🐞 Bug Bounty',
+                desc: 'Get paid to hack. Legally.',
+                items: [
+                    { title: 'NahamSec Resources', url: 'https://github.com/nahamsec/Resources-for-Beginner-Bug-Bounty-Hunters',
+                        desc: 'Beginner bug bounty resources.', tag: 'Beginner', featured: true },
+                ]
+            },
+            blueteam: {
+                title: '🟦 Blue Team / Defensive',
+                desc: 'Defend the realm. Detect and respond.',
+                items: [
+                    { title: 'LetsDefend', url: 'https://letsdefend.io/', desc: 'Blue team training platform.',
+                        tag: 'Training', featured: true },
+                    { title: 'Elastic Security Labs', url: 'https://www.elastic.co/security-labs',
+                        desc: 'Security research and detection.', tag: 'Research' },
+                    { title: 'Security Onion', url: 'https://www.securityonion.net/',
+                        desc: 'Network security monitoring platform.', tag: 'Monitoring' },
+                ]
+            },
+            programming: {
+                title: '🧩 Programming',
+                desc: 'Code is your weapon. Sharpen it.',
+                items: [
+                    { title: 'Learn C', url: 'https://www.learn-c.org/', desc: 'Interactive C programming tutorial.',
+                        tag: 'C' },
+                    { title: 'Learn C++', url: 'https://learncpp.com/', desc: 'Comprehensive C++ tutorial.', tag: 'C++' },
+                    { title: 'W3Schools C', url: 'https://www.w3schools.com/c/', desc: 'C language reference.',
+                    tag: 'C' },
+                    { title: 'CS50 Manual', url: 'https://manual.cs50.io/', desc: 'CS50 programming manual.',
+                        tag: 'Reference' },
+                    { title: 'Project-Based Learning', url: 'https://github.com/practical-tutorials/project-based-learning',
+                        desc: 'Learn by building projects.', tag: 'Projects', featured: true },
+                ]
+            },
+            lowlevel: {
+                title: '⚙️ Low Level / Reverse Engineering / Systems',
+                desc: 'Go deep. Understand the machine.',
+                items: [
+                    { title: 'RE Manual', url: 'https://trillium-2.gitbook.io/re-manual/',
+                        desc: 'Reverse engineering guide.', tag: 'RE', featured: true },
+                    { title: 'Crafting Interpreters', url: 'https://craftinginterpreters.com/',
+                        desc: 'Build your own programming language.', tag: 'Compilers' },
+                    { title: 'Lispy', url: 'https://norvig.com/lispy.html', desc: 'Build a Lisp interpreter in Python.',
+                        tag: 'Lisp' },
+                    { title: 'ACWJ', url: 'https://github.com/DoctorWkt/acwj',
+                        desc: 'A Compiler Writing Journey.', tag: 'Compiler' },
+                ]
+            },
+            'osint-adv': {
+                title: '🔎 OSINT (Advanced Tools)',
+                desc: 'Next-level open-source intelligence.',
+                items: [
+                    { title: 'SANS OSINT Resources', url: 'https://www.sans.org/blog/-must-have-free-resources-for-open-source-intelligence-osint-/',
+                        desc: 'SANS OSINT resource guide.', tag: 'SANS', featured: true },
+                    { title: 'Common Crawl', url: 'https://commoncrawl.org/', desc: 'Web crawl data archive.',
+                        tag: 'Data' },
+                    { title: 'Hunchly', url: 'https://hunch.ly/', desc: 'OSINT investigation tool.', tag: 'Tool' },
+                    { title: 'FotoForensics', url: 'https://fotoforensics.com/', desc: 'Image forensic analysis.',
+                        tag: 'Forensics' },
+                    { title: 'Gitrob', url: 'https://github.com/michenriksen/gitrob',
+                        desc: 'GitHub sensitive data scanner.', tag: 'GitHub' },
+                ]
+            },
+            books: {
+                title: '📚 Books & Notes',
+                desc: 'Knowledge that fits in your pocket.',
+                items: [
+                    { title: 'Hacking & Bug Bounty Books', url: 'https://github.com/Kalyan-Deva/Hacking-Bug-Bounty-Books',
+                        desc: 'Curated cybersecurity books.', tag: 'Books', featured: true },
+                    { title: 'Ethical Hacking Ebooks', url: 'https://github.com/mrH0411/Ebook-EthicalHacking',
+                        desc: 'Free ethical hacking ebooks.', tag: 'Ebooks' },
+                    { title: 'PirateMoo Notes', url: 'https://notes.piratemoo.com/mobiles',
+                        desc: 'Mobile security notes.', tag: 'Mobile' },
+                ]
+            },
+            cheatsheets: {
+                title: '🧠 Cheat Sheets',
+                desc: 'Quick reference for when it counts.',
+                items: [
+                    { title: 'CTF CheatSheet', url: 'https://github.com/RajChowdhury240/CTF-CheatSheet',
+                        desc: 'Comprehensive CTF cheat sheet.', tag: 'CTF' },
+                    { title: 'Awesome CTF Cheatsheet', url: 'https://github.com/uppusaikiran/awesome-ctf-cheatsheet',
+                        desc: 'Curated CTF cheatsheet list.', tag: 'CTF' },
+                    { title: 'Nmap Cheat Sheet', url: 'https://cdn.comparitech.com/wp-content/uploads/2019/06/Nmap-Cheat-Sheet.pdf',
+                        desc: 'Nmap quick reference PDF.', tag: 'Nmap', featured: true },
+                ]
+            },
+            youtube: {
+                title: '📺 YouTube Channels',
+                desc: 'Learn from the best content creators.',
+                items: [
+                    { title: 'LiveOverflow', url: 'https://www.youtube.com/@LiveOverflow',
+                        desc: 'Binary exploitation & RE deep dives.', tag: 'RE', youtube: true },
+                    { title: 'John Hammond', url: 'https://www.youtube.com/@_JohnHammond',
+                        desc: 'CTF walkthroughs & malware analysis.', tag: 'CTF', youtube: true, featured: true },
+                    { title: 'NetworkChuck', url: 'https://www.youtube.com/@NetworkChuck',
+                        desc: 'Networking & cybersecurity basics.', tag: 'Networking', youtube: true },
+                    { title: 'Computerphile', url: 'https://www.youtube.com/@Computerphile',
+                        desc: 'Computer science concepts explained.', tag: 'CS', youtube: true },
+                    { title: 'Low Level', url: 'https://www.youtube.com/@LowLevelTV',
+                        desc: 'Low-level programming & systems.', tag: 'Systems', youtube: true },
+                    { title: 'Fireship', url: 'https://www.youtube.com/@Fireship',
+                        desc: 'Code reports & tech news.', tag: 'Dev', youtube: true },
+                    { title: 'DEF CON', url: 'https://www.youtube.com/@DEFCONConference',
+                        desc: 'DEF CON conference talks.', tag: 'Conference', youtube: true, featured: true },
+                    { title: 'BlackHat', url: 'https://www.youtube.com/@BlackHatOfficial',
+                        desc: 'Black Hat conference presentations.', tag: 'Conference', youtube: true },
+                ]
+            },
+            blogs: {
+                title: '🌍 Blogs & News',
+                desc: 'Stay informed. Stay ahead.',
+                items: [
+                    { title: 'Krebs on Security', url: 'https://krebsonsecurity.com/',
+                        desc: 'Investigative security journalism.', tag: 'News', featured: true },
+                    { title: 'The Hacker News', url: 'https://thehackernews.com/', desc: 'Cybersecurity news platform.',
+                        tag: 'News' },
+                    { title: 'Dark Reading', url: 'https://www.darkreading.com/',
+                        desc: 'Cybersecurity news & analysis.', tag: 'News' },
+                    { title: 'BleepingComputer', url: 'https://www.bleepingcomputer.com/',
+                        desc: 'Tech news & security.', tag: 'News' },
+                    { title: 'PortSwigger Research', url: 'https://portswigger.net/research',
+                        desc: 'Web security research blog.', tag: 'Research', featured: true },
+                    { title: 'Rapid7 Blog', url: 'https://www.rapid7.com/blog/', desc: 'Security research & insights.',
+                        tag: 'Research' },
+                ]
+            },
+            ai: {
+                title: '🤖 AI / ML',
+                desc: 'Machine learning meets cybersecurity.',
+                items: [
+                    { title: 'Deep-ML', url: 'https://www.deep-ml.com/', desc: 'Machine learning challenges.',
+                        tag: 'ML', featured: true },
+                ]
+            },
+            malware: {
+                title: '🧠 Malware Development',
+                desc: 'Know your enemy by becoming one.',
+                items: [
+                    { title: 'Self-Taught Malware Dev', url: 'https://racoten.github.io/Self-Taught-Course/',
+                        desc: 'Malware development course.', tag: 'Malware', featured: true },
+                ]
+            },
+            auto: {
+                title: '🚗 Automotive Hacking',
+                desc: 'Hack the vehicles of tomorrow.',
+                items: [
+                    { title: 'Automotive Cybersecurity Roadmap', url: 'https://github.com/AutoSecurityy/Automotive-Cybersecurity-Roadmap',
+                        desc: 'Car hacking learning path.', tag: 'Automotive' },
+                    { title: 'Carpunk', url: 'https://github.com/souravbaghz/Carpunk',
+                        desc: 'Automotive CAN bus hacking.', tag: 'CAN' },
+                ]
+            },
+            firmware: {
+                title: '🔐 Firmware / Intel ME',
+                desc: 'Low-level hardware security.',
+                items: [
+                    { title: 'ME Analyzer', url: 'https://github.com/platomav/MEAnalyzer',
+                        desc: 'Intel ME firmware analysis.', tag: 'Firmware' },
+                    { title: 'ME Cleaner', url: 'https://github.com/corna/me_cleaner',
+                        desc: 'Intel ME modification tool.', tag: 'Firmware' },
+                ]
+            },
+            masterlists: {
+                title: '📦 Master Lists',
+                desc: 'The ultimate resource compilations.',
+                items: [
+                    { title: 'Awesome CTF Resources', url: 'https://github.com/devploit/awesome-ctf-resources',
+                        desc: 'Mega CTF resource list.', tag: 'List', featured: true },
+                    { title: 'Awesome CTF', url: 'https://github.com/apsdehal/awesome-ctf',
+                        desc: 'Comprehensive CTF resource.', tag: 'List' },
+                ]
+            },
+            roadmap: {
+                title: '🧭 DarkSage Learning Roadmap',
+                desc: 'Your guided path to mastery.',
+                items: [
+                    { title: 'Step 1: Foundations', url: '#', desc: 'CS50 + Networking fundamentals.',
+                        tag: 'Start', featured: true, internal: true },
+                    { title: 'Step 2: Hands-On', url: '#', desc: 'TryHackMe / CTFlearn practice.', tag: 'Practice',
+                        internal: true },
+                    { title: 'Step 3: Tools', url: '#', desc: 'Master Nmap, Burp, Wireshark.', tag: 'Tools',
+                    internal: true },
+                    { title: 'Step 4: Labs', url: '#', desc: 'HTB, VulnHub, GOAD.', tag: 'Labs', internal: true },
+                    { title: 'Step 5: Specialize', url: '#', desc: 'Pick your path and go deep.', tag: 'Mastery',
+                        internal: true },
+                ]
+            },
+        };
+
+        // YouTube channel IDs mapping
+        const youtubeChannels = {
+            'LiveOverflow': 'UClcE-kVhqyiHCcjYwcpfj9w',
+            'John Hammond': 'UCVeW9qkBjo3zosnqUbG7CFw',
+            'NetworkChuck': 'UC9x0AN7BWHpCDHSm9NiJFJQ',
+            'Computerphile': 'UC9-y-6csu5WGm29I7JiwpnA',
+            'Low Level': 'UCVls1GmFKf6WlTraFt_IqJg',
+            'Fireship': 'UCsBjURrPvewk8tfyZ5C2f4g',
+            'DEF CON': 'UC6Om9kAkl32dWlDSNlDS9Iw',
+            'BlackHat': 'UCJ6q9Ie29ajGqKApbLqfBOg',
+        };
+
+        // Render all sections
+        function renderAllSections() {
+            const mainContent = document.getElementById('mainContent');
+            let html = '';
+
+            for (const [key, section] of Object.entries(resources)) {
+                html += renderSection(key, section);
+            }
+
+            mainContent.innerHTML = html;
+        }
+
+        // Render a single section
+        function renderSection(key, section) {
+            let html = `
+                <div class="section" id="${key}">
+                    <div class="terminal-header">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-title">DarkSage@arsenal:~/$(echo ${key} | tr '-' '_')</span>
+                    </div>
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <span class="section-emoji">${section.title.split(' ')[0]}</span>
+                            ${section.title.split(' ').slice(1).join(' ')}
+                        </h2>
+                        <p class="section-desc">${section.desc}</p>
+                        <div class="resource-grid">
+            `;
+
+            section.items.forEach((item, index) => {
+                const featuredClass = item.featured ? 'featured' : '';
+                const externalIcon = item.internal ? '' : '↗';
+                const onClick = item.youtube ?
+                    `onclick="openYouTubeModal('${item.title}', event)"` :
+                    (item.internal ? `onclick="scrollToTop(event)"` :
+                        `onclick="window.open('${item.url}', '_blank')"`);
+                const href = item.internal ? '#' : item.url;
+
+                html += `
+                    <a href="${href}" class="resource-card ${featuredClass}" ${onClick} 
+                       data-title="${item.title}" data-desc="${item.desc}" data-tag="${item.tag}">
+                        <span class="external-icon">${externalIcon}</span>
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-desc">${item.desc}</div>
+                        <span class="card-tag">${item.tag}</span>
+                    </a>
+                `;
+            });
+
+            html += `
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return html;
+        }
+
+        // YouTube Modal Functions
+        function openYouTubeModal(channelName, event) {
+            event.preventDefault();
+            const channelId = youtubeChannels[channelName];
+            if (!channelId) return;
+
+            const modal = document.getElementById('youtubeModal');
+            const playerDiv = document.getElementById('youtubePlayer');
+
+            playerDiv.innerHTML = `
+                <iframe 
+                    src="https://www.youtube.com/embed?listType=playlist&list=UU${channelId.substring(2)}" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            `;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeYouTubeModal() {
+            const modal = document.getElementById('youtubeModal');
+            const playerDiv = document.getElementById('youtubePlayer');
+            playerDiv.innerHTML = '';
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('closeModal').addEventListener('click', closeYouTubeModal);
+        document.getElementById('youtubeModal').addEventListener('click', function(e) {
+            if (e.target === this) closeYouTubeModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeYouTubeModal();
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.resource-card');
+            const sections = document.querySelectorAll('.section');
+
+            let anyVisible = false;
+
+            sections.forEach(section => {
+                const sectionCards = section.querySelectorAll('.resource-card');
+                let sectionHasVisible = false;
+
+                sectionCards.forEach(card => {
+                    const title = (card.dataset.title || '').toLowerCase();
+                    const desc = (card.dataset.desc || '').toLowerCase();
+                    const tag = (card.dataset.tag || '').toLowerCase();
+
+                    if (!query || title.includes(query) || desc.includes(query) || tag.includes(query)) {
+                        card.style.display = 'block';
+                        sectionHasVisible = true;
+                        anyVisible = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                section.style.display = sectionHasVisible || !query ? 'block' : 'none';
+            });
+
+            // Handle no results
+            const existingNoResults = document.querySelector('.no-results');
+            if (!anyVisible && query) {
+                if (!existingNoResults) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-results';
+                    noResults.innerHTML = `
+                        <span class="emoji">🔍</span>
+                        No resources found matching "${query}"<br>
+                        <span style="font-size:0.8rem">Try: nmap, web, CTF, AD, OSINT</span>
+                    `;
+                    document.getElementById('mainContent').appendChild(noResults);
+                }
+            } else if (existingNoResults) {
+                existingNoResults.remove();
+            }
+        });
+
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Sidebar navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const target = document.getElementById(targetId);
+
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+
+                // Close sidebar on mobile
+                document.getElementById('sidebar').classList.remove('active');
+
+                // Update active state
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove(
+                'active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Scroll spy
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Matrix Rain Animation
+        function initMatrixRain() {
+            const canvas = document.getElementById('matrix-bg');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*()_+-=[]{}|;:,.<>?/~`';
+            const fontSize = 10;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * canvas.height;
+            }
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#00ff41';
+                ctx.font = `${fontSize}px monospace`;
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            setInterval(draw, 50);
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // Scroll to top for internal links
+        function scrollToTop(event) {
+            event.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Set current year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Initialize
+        renderAllSections();
+        initMatrixRain();
+
+        // Console Easter Egg
+        console.log(`
+        ⚡ DarkSage Cyber Arsenal ⚡
+        "The quieter you become, the more you are able to hear."
+        - Think deeply. Hack ethically. Stay curious. -
+        `);
+    </script>
+</body>
+</html>
